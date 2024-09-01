@@ -6,7 +6,7 @@ public class DataMosh : MonoBehaviour
     public Material DMMat;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
         this.GetComponent<Camera>().depthTextureMode = DepthTextureMode.MotionVectors;
     }
