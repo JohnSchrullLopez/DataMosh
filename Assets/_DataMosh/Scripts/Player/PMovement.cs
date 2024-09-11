@@ -6,54 +6,58 @@ public class PMovement : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _mouseSensitivity;
-    private Rigidbody _rigidbody;
-    private Vector3 _moveAxis;
-    private Vector2 _camMoveAxis;
+    
     private Camera _mainCamera;
     private Transform _playerTransform;
-    private float xMouse, yMouse, xRotation, yRotation, xAxis, zAxis;
+    private CharacterController _characterController;
+
+    private Vector3 _movementInput;
+    private Vector2 _camInput;
+    private float _gravity = -9.81f;
+    private float _yVelocity;
+    private Vector2 _currentCameraRotation;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _rigidbody = GetComponent<Rigidbody>();
-        _moveAxis = Vector3.zero;
-        _camMoveAxis = Vector3.zero;
-        _playerTransform = GetComponent<Transform>();
+        _characterController = GetComponent<CharacterController>();
         _mainCamera = GetComponentInChildren<Camera>();
-        
+        _playerTransform = GetComponent<Transform>();
         Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
     void Update()
     {
-        GetMovementInput();
+        UpdateMovement();
         GetCameraInput();
-        
-        transform.rotation = Quaternion.Euler(0, xRotation, 0);
-        _playerTransform.Rotate(Vector3.up * xMouse);
-        _mainCamera.transform.Rotate(Vector3.left * -yMouse);
     }
 
     private void GetCameraInput()
     {
-        xMouse = Input.GetAxis("Mouse X") * _mouseSensitivity * Time.deltaTime;
-        yMouse = -Input.GetAxis("Mouse Y") * _mouseSensitivity * Time.deltaTime;
-
-        yRotation += yMouse;
-        xRotation += xMouse;
-        yRotation = Mathf.Clamp(yRotation, -90, 90);
+        //Get mouse movement each frame and add result to the transform's rotation
+        _camInput = new Vector2(Input.GetAxis("Mouse X") * _mouseSensitivity * Time.deltaTime, Input.GetAxis("Mouse Y") * _mouseSensitivity * Time.deltaTime);
+        _currentCameraRotation += _camInput;
+        
+        //Horizontal cam movement
+        transform.localRotation = Quaternion.AngleAxis(_currentCameraRotation.x, Vector3.up);
+        
+        //Vertical cam movement
+        _mainCamera.transform.localRotation = Quaternion.AngleAxis(-_currentCameraRotation.y, Vector3.right);
     }
 
-    private void GetMovementInput()
+    private void UpdateMovement()
     {
-        xAxis = Input.GetAxis("Horizontal") * _moveSpeed * Time.deltaTime;
-        zAxis = Input.GetAxis("Vertical") * _moveSpeed * Time.deltaTime;
-    }
-
-    private void FixedUpdate()
-    {
-        _rigidbody.velocity = transform.forward * zAxis + transform.up * _rigidbody.velocity.y + transform.right * xAxis;
+        //Gravity
+        if (_characterController.isGrounded && _yVelocity < 0)
+        {
+            _yVelocity = 0f;
+        }
+        _yVelocity += _gravity * Time.deltaTime;
+        
+        //WASD movement
+        _movementInput = new Vector3(Input.GetAxis("Horizontal"), _yVelocity, Input.GetAxis("Vertical"));
+        _movementInput = _playerTransform.TransformDirection(_movementInput);
+        _characterController.Move(_movementInput * _moveSpeed * Time.deltaTime);
     }
 }
