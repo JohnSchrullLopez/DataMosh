@@ -506,7 +506,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveSpeed: 10
-  _mouseSensitivity: 25
+  _mouseSensitivity: 50
 --- !u!143 &709368781
 CharacterController:
   m_ObjectHideFlags: 0

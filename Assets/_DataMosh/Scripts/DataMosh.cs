@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class DataMosh : MonoBehaviour
@@ -8,6 +9,11 @@ public class DataMosh : MonoBehaviour
     private void Start()
     {
         this.GetComponent<Camera>().depthTextureMode = DepthTextureMode.MotionVectors;
+    }
+
+    private void Update()
+    {
+        Shader.SetGlobalInt("_Button", Input.GetButton("Fire1") ? 1 : 0);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)

@@ -8,7 +8,7 @@ Shader "Hidden/DMEffect"
     {
         // No culling or depth
         Cull Off ZWrite Off ZTest Always
-
+        
         Pass
         {
             CGPROGRAM
@@ -39,14 +39,14 @@ Shader "Hidden/DMEffect"
 
             sampler2D _MainTex;
             sampler2D _CameraMotionVectorsTexture;
-
+ 
             fixed4 frag (v2f i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
-                float4 mot = tex2D(_CameraMotionVectorsTexture, i.uv);
-                
-                col += mot * 2;
-
+                float4 mot = tex2D(_CameraMotionVectorsTexture,i.uv);
+ 
+                col+=mot;//add motion vector values to the current colors
+ 
                 return col;
             }
             ENDCG
