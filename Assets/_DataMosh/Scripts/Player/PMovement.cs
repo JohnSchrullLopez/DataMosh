@@ -41,7 +41,6 @@ public class PMovement : MonoBehaviour
         
         //Horizontal cam movement
         transform.localRotation = Quaternion.AngleAxis(_currentCameraRotation.x, Vector3.up);
-        
         //Vertical cam movement
         _mainCamera.transform.localRotation = Quaternion.AngleAxis(-_currentCameraRotation.y, Vector3.right);
     }
