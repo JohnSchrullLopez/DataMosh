@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
-public class PMovement : MonoBehaviour
+public class SPlayerMovement : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _mouseSensitivity;

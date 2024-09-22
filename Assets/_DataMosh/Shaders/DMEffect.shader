@@ -9,11 +9,6 @@ Shader "Hidden/DMEffect"
         // No culling or depth
         Cull Off ZWrite Off ZTest Always
         
-        GrabPass
-        {
-            "_PR"
-        }
-        
         Pass
         {
             CGPROGRAM
@@ -44,16 +39,25 @@ Shader "Hidden/DMEffect"
 
             sampler2D _MainTex;
             sampler2D _CameraMotionVectorsTexture;
-            sampler2D _PR;
+            sampler2D _Prev;
             int _Trigger;
  
             fixed4 frag (v2f i) : SV_Target
             {
-                float4 mot = tex2D(_CameraMotionVectorsTexture,i.uv);
+                float2 uvr=round(i.uv*(_ScreenParams.xy/64))/(_ScreenParams.xy/64);
+                //Get motion texture for current frame
+                float4 mot = tex2D(_CameraMotionVectorsTexture,uvr);
 
+                //Fix coordinate differences between graphics APIs
+                //Displace uv coordinates by intensity of Motion texture
+                #if UNITY_UV_STARTS_AT_TOP
+                float2 mvuv = float2(i.uv.x-mot.r,1-i.uv.y+mot.g);
+                #else
                 float2 mvuv = float2(i.uv.x-mot.r,i.uv.y-mot.g);
- 
-                fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_PR, mvuv),_Trigger);
+                #endif
+
+                //lerp switches between updating current frame normally or applying the datamosh effect to the previous frame
+                fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv),_Trigger);
                 return col;
             }
             ENDCG
