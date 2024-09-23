@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-//TODO: Cache shader variable locations
 public class SDataMoshEffect : MonoBehaviour
 {
     public Material DMMat;
