@@ -42,10 +42,11 @@ Shader "Custom/DMEffect"
             sampler2D _CameraDepthTexture;
             sampler2D _Prev;
             int _Trigger;
+            int _BlockSize;
  
             fixed4 frag (v2f i) : SV_Target
             {
-                float2 uvr=round(i.uv*(_ScreenParams.xy/64))/(_ScreenParams.xy/64);
+                float2 uvr=round(i.uv*(_ScreenParams.xy/_BlockSize))/(_ScreenParams.xy/_BlockSize);
                 //Get motion texture for current frame
                 float4 mot = tex2D(_CameraMotionVectorsTexture,uvr);
                 float4 depth = tex2D(_CameraDepthTexture, i.uv);
