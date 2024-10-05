@@ -8,7 +8,7 @@ Shader "Custom/DMEffect"
     {
         // No culling or depth
         Cull Off ZWrite Off ZTest Always
-        
+
         Pass
         {
             CGPROGRAM
@@ -40,6 +40,7 @@ Shader "Custom/DMEffect"
             sampler2D _MainTex;
             sampler2D _CameraMotionVectorsTexture;
             sampler2D _CameraDepthTexture;
+            sampler2D _Mask;
             sampler2D _Prev;
             int _Trigger;
             int _BlockSize;
@@ -50,18 +51,28 @@ Shader "Custom/DMEffect"
                 //Get motion texture for current frame
                 float4 mot = tex2D(_CameraMotionVectorsTexture,uvr);
                 float4 depth = tex2D(_CameraDepthTexture, i.uv);
-
+                float4 mask = tex2D(_Mask, i.uv);
+                
                 //Fix coordinate differences between graphics APIs
                 //Displace uv coordinates by intensity of Motion texture
                 #if UNITY_UV_STARTS_AT_TOP
                 float2 mvuv = float2(i.uv.x-mot.r, 1-i.uv.y+mot.g);
                 #else
                 float2 mvuv = float2(i.uv.x-mot.r, i.uv.y-mot.g);
+                //float2 muv = float2(i.uv.x-mask.r, 1-i.uv.y+mask.g);
                 #endif
 
-                //lerp switches between updating current frame normally or applying the datamosh effect to the previous frame
+                
+                
+                //FULLSCREEN
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _Trigger);
-                fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), 1 - depth.r);
+
+                //OBJECT MASKED
+                fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), tex2D(_Mask, i.uv).a);
+
+                //DOF BASED
+                //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), 1 - depth.r);
+                
                 return col;
             }
             ENDCG

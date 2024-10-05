@@ -4,7 +4,11 @@ using UnityEngine.UI;
 
 public class SDataMoshEffect : MonoBehaviour
 {
+    //TODO: Organize Code, Fix Object mask occlusion bug
+    
     public Material DMMat;
+    public RawImage DebugImage;
+    private RenderTexture _objectMask;
     private RenderTexture _buffer;
     private int _triggerID;
     private int _prevID;
@@ -20,11 +24,15 @@ public class SDataMoshEffect : MonoBehaviour
         //Generate motion texture on main camera
         this.GetComponent<Camera>().depthTextureMode = DepthTextureMode.MotionVectors;
         _buffer = new RenderTexture(Screen.width, Screen.height, 16);
+        _objectMask = new RenderTexture(Camera.main.pixelWidth, Camera.main.pixelHeight, 16);
         
         //Cache property IDs and initialize
         _triggerID = Shader.PropertyToID("_Trigger");    
         _prevID = Shader.PropertyToID("_Prev");
         Shader.SetGlobalInteger("_BlockSize", _BlockSize);
+        
+        transform.GetChild(0).GetComponent<Camera>().targetTexture = _objectMask;
+        DebugImage.texture = _objectMask;
     }
 
     private void Update()
@@ -49,6 +57,7 @@ public class SDataMoshEffect : MonoBehaviour
         
         //Send previous frame to shader
         Shader.SetGlobalTexture(_prevID, _buffer);
+        Shader.SetGlobalTexture("_Mask", _objectMask);
         //Run shader on current frame
         Graphics.Blit(source, destination, DMMat);
         //Store output into buffer to use as previous frame in next iteration
