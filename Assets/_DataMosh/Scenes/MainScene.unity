@@ -7145,7 +7145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DMMat: {fileID: 2100000, guid: e3a5418b7d9b12d40b12b26586249590, type: 2}
   DebugImage: {fileID: 659638099}
-  _BlockSize: 36
+  _BlockSize: 32
 --- !u!1 &1496568771
 GameObject:
   m_ObjectHideFlags: 0
