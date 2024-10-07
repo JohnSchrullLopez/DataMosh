@@ -16,11 +16,11 @@ Shader "Custom/DMEffect"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
-
-            /*float nrand(float x, float y)
-            {
-                return frac(sin(dot(float2(x, y), float2(12.9898, 78.233))) * 43758.5453);
-            }*/
+            
+            /*
+             * Random number generation taken from Spatial in this stack overflow question:
+             * https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+            */
             
             // A single iteration of Bob Jenkins' One-At-A-Time hashing algorithm.
             uint hash( uint x )
@@ -47,7 +47,7 @@ Shader "Custom/DMEffect"
                 return f - 1.0;                        // Range [0:1]
             }
 
-            float nrand(float x)
+            float random(float x)
             {
                 return floatConstruct(hash(asint(x)));
             }
@@ -77,29 +77,34 @@ Shader "Custom/DMEffect"
             sampler2D _CameraDepthTexture;
             sampler2D _Mask;
             sampler2D _Prev;
+            
             int _Trigger;
             int _BlockSize;
+            float _PerBlockNoise;
+            float _BlockDecay;
  
             fixed4 frag (v2f i) : SV_Target
             {
+                //create blocks by rounding uv
                 float2 uvr=round(i.uv*(_ScreenParams.xy/_BlockSize))/(_ScreenParams.xy/_BlockSize);
-                float n = nrand(_Time.x * (uvr.x+uvr.y*_ScreenParams.x));
-                //float n = nrand(_Time.x,uvr.x+uvr.y*_ScreenParams.x);
-                //Get motion texture for current frame
+
+                //Get motion texture for current frame and use rounded uvs to sample texture
                 float4 mot = tex2D(_CameraMotionVectorsTexture,uvr);
-                mot=max(abs(mot)-round(n/1.4),0)*sign(mot);
                 float4 depth = tex2D(_CameraDepthTexture, i.uv);
                 float4 mask = tex2D(_Mask, i.uv);
+
+                //add noise to individual blocks
+                float n = random(_Time.x * (uvr.x+uvr.y*_ScreenParams.x));
+                mot=max(abs(mot)-round(n/_PerBlockNoise),0)*sign(mot);
+                
                 //Fix coordinate differences between graphics APIs
                 //Displace uv coordinates by intensity of Motion texture
                 #if UNITY_UV_STARTS_AT_TOP
                 float2 mvuv = float2(i.uv.x-mot.r, 1-i.uv.y+mot.g);
                 #else
                 float2 mvuv = float2(i.uv.x-mot.r, i.uv.y-mot.g);
-                //float2 muv = float2(i.uv.x-mask.r, 1-i.uv.y+mask.g);
                 #endif
 
-                
                 
                 //FULLSCREEN
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _Trigger);
@@ -111,7 +116,7 @@ Shader "Custom/DMEffect"
                 //DOF BASED
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), 1 - depth.r);
 
-                fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv),lerp(round(1-(n)/1.4),1,_Trigger));
+                fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv),lerp(round(1-(n)/_BlockDecay),1,_Trigger));
                 
                 return col;
             }

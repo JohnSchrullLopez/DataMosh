@@ -13,6 +13,8 @@ public class SDataMoshEffect : MonoBehaviour
     private int _triggerID;
     private int _prevID;
     [SerializeField] private int _BlockSize = 16;
+    [SerializeField, Range(0.7f, 1.9f)] private float _PerBlockNoise = 1.4f;
+    [SerializeField, Range(0.7f, 1.9f)] private float _BlockDecay = 1.4f;
 
     private void Awake()
     {
@@ -30,7 +32,10 @@ public class SDataMoshEffect : MonoBehaviour
         _triggerID = Shader.PropertyToID("_Trigger");    
         _prevID = Shader.PropertyToID("_Prev");
         Shader.SetGlobalInteger("_BlockSize", _BlockSize);
+        Shader.SetGlobalFloat("_PerBlockNoise", _PerBlockNoise);
+        Shader.SetGlobalFloat("_BlockDecay", _BlockDecay);
         
+        //Debugging
         transform.GetChild(0).GetComponent<Camera>().targetTexture = _objectMask;
         DebugImage.texture = _objectMask;
     }
@@ -55,11 +60,13 @@ public class SDataMoshEffect : MonoBehaviour
             _buffer = new RenderTexture(Screen.width, Screen.height, 16);
         }
         
-        //Send previous frame to shader
+        //Send previous frame and object mask to shader
         Shader.SetGlobalTexture(_prevID, _buffer);
         Shader.SetGlobalTexture("_Mask", _objectMask);
+        
         //Run shader on current frame
         Graphics.Blit(source, destination, DMMat);
+        
         //Store output into buffer to use as previous frame in next iteration
         //Active render texture is null so it renders directly to main window.
         RenderTexture.active = Camera.main.targetTexture;
