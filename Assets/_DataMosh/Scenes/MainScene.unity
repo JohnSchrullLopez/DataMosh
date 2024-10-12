@@ -7148,6 +7148,7 @@ MonoBehaviour:
   _BlockSize: 32
   _PerBlockNoise: 1.4
   _BlockDecay: 1.4
+  _intensityValue: 0.498
 --- !u!1 &1496568771
 GameObject:
   m_ObjectHideFlags: 0

@@ -78,11 +78,11 @@ Shader "Custom/DMEffect"
             sampler2D _Mask;
             sampler2D _Prev;
             
-            int _Trigger;
+            float _DMIntensity;
             int _BlockSize;
             float _PerBlockNoise;
             float _BlockDecay;
- 
+
             fixed4 frag (v2f i) : SV_Target
             {
                 //create blocks by rounding uv
@@ -107,7 +107,7 @@ Shader "Custom/DMEffect"
 
                 
                 //FULLSCREEN
-                //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _Trigger);
+                //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity);
 
                 //OBJECT MASKED
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), tex2D(_Mask, i.uv).a);
@@ -116,7 +116,7 @@ Shader "Custom/DMEffect"
                 //DOF BASED
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), 1 - depth.r);
 
-                fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv),lerp(round(1-(n)/_BlockDecay),1,_Trigger));
+                fixed4 col = lerp(lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity), tex2D(_Prev, mvuv), tex2D(_Mask, i.uv).a);
                 
                 return col;
             }

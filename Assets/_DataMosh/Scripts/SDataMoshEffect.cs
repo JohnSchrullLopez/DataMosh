@@ -1,20 +1,24 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
+using System.Collections;
 
 public class SDataMoshEffect : MonoBehaviour
 {
     //TODO: Organize Code, Fix Object mask occlusion bug
-    
     public Material DMMat;
     public RawImage DebugImage;
     private RenderTexture _objectMask;
     private RenderTexture _buffer;
-    private int _triggerID;
+    private int _intensityID;
     private int _prevID;
     [SerializeField] private int _BlockSize = 16;
     [SerializeField, Range(0.7f, 1.9f)] private float _PerBlockNoise = 1.4f;
     [SerializeField, Range(0.7f, 1.9f)] private float _BlockDecay = 1.4f;
+    [SerializeField, Range(0, 1)] public float _intensityValue = 0.0f;
+    private bool _transitioningInto = false;
+    private float lerpVal = 0.0f;
 
     private void Awake()
     {
@@ -29,7 +33,7 @@ public class SDataMoshEffect : MonoBehaviour
         _objectMask = new RenderTexture(Camera.main.pixelWidth, Camera.main.pixelHeight, 16);
         
         //Cache property IDs and initialize
-        _triggerID = Shader.PropertyToID("_Trigger");    
+        _intensityID = Shader.PropertyToID("_DMIntensity");    
         _prevID = Shader.PropertyToID("_Prev");
         Shader.SetGlobalInteger("_BlockSize", _BlockSize);
         Shader.SetGlobalFloat("_PerBlockNoise", _PerBlockNoise);
@@ -43,14 +47,13 @@ public class SDataMoshEffect : MonoBehaviour
     private void Update()
     {
         //Set lerp value in shader to toggle effect
-        if (Input.GetButton("Fire1"))
+        if (Input.GetButtonDown("Fire1"))
         {
-            Shader.SetGlobalInteger(_triggerID, 1);
+            _transitioningInto = !_transitioningInto;
         }
-        else
-        {
-            Shader.SetGlobalInteger(_triggerID, 0);
-        }
+
+        SmoothTransition();
+        Shader.SetGlobalFloat(_intensityID, _intensityValue);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -71,5 +74,22 @@ public class SDataMoshEffect : MonoBehaviour
         //Active render texture is null so it renders directly to main window.
         RenderTexture.active = Camera.main.targetTexture;
         Graphics.Blit(RenderTexture.active, _buffer);
+    }
+
+    private void SmoothTransition()
+    {
+        if (_transitioningInto)
+        {
+            //DOTween.To(() => _intensityValue, x => _intensityValue = x, 1f, 0.5f);
+            lerpVal += Time.deltaTime * 0.5f;
+        }
+        else
+        {
+            //DOTween.To(() => _intensityValue, x => _intensityValue = x, 0f, 5);
+            lerpVal -= Time.deltaTime * 0.5f;
+        }
+
+        lerpVal = Mathf.Clamp(lerpVal, 0.0f, 1.0f);
+        _intensityValue = Mathf.Lerp(0f, 1f, lerpVal);
     }
 }
