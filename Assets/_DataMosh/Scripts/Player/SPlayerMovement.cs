@@ -10,7 +10,9 @@ public class SPlayerMovement : MonoBehaviour
     [Header("Player Physics")]
     [SerializeField] private float _groundDrag = 5f;
     [SerializeField] private float _airDrag = 2f;
+    [SerializeField] private float _jumpForce = 10f;
     [SerializeField] private LayerMask _groundLayerMask;
+    [SerializeField] private float _gravity = 9.81f;
 
     private SPlayerInput _input;
     private Transform _orientation;
@@ -35,13 +37,24 @@ public class SPlayerMovement : MonoBehaviour
     private void Update()
     {
         MoveCamera();
-        HandleDrag();
-        Debug.Log(_playerRB.linearVelocity);
+        ApplyDrag();
+        Jump();
+
+        Physics.gravity = new Vector3(0, -_gravity, 0);
     }
 
-    private void HandleDrag()
+    private void Jump()
     {
-        _isGrounded = Physics.Raycast(transform.position, Vector3.down, _playerHeight * 0.5f + 0.2f, _groundLayerMask);
+        if (_input._jumpPressed && _isGrounded)
+        {
+            _playerRB.AddForce(_orientation.up * _jumpForce, ForceMode.Impulse);
+            _input._jumpPressed = false;
+        }
+    }
+
+    private void ApplyDrag()
+    {
+        GroundCheck();
 
         if (_isGrounded)
         {
@@ -51,6 +64,11 @@ public class SPlayerMovement : MonoBehaviour
         {
             _playerRB.linearDamping = _airDrag;
         }
+    }
+
+    private void GroundCheck()
+    {
+        _isGrounded = Physics.Raycast(transform.position, Vector3.down, _playerHeight * 0.5f + 0.1f, _groundLayerMask);
     }
 
     private void FixedUpdate()

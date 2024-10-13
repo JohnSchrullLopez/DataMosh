@@ -36,6 +36,15 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""1203f085-a95a-44e9-a07a-3b95a8b1ce66"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -93,6 +102,17 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
                     ""action"": ""WASD Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""43617fb1-55ff-4750-8d91-4a245b8df954"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -102,6 +122,7 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
         // Player Input
         m_PlayerInput = asset.FindActionMap("Player Input", throwIfNotFound: true);
         m_PlayerInput_WASDMovement = m_PlayerInput.FindAction("WASD Movement", throwIfNotFound: true);
+        m_PlayerInput_Jump = m_PlayerInput.FindAction("Jump", throwIfNotFound: true);
     }
 
     ~@FPInput()
@@ -169,11 +190,13 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_PlayerInput;
     private List<IPlayerInputActions> m_PlayerInputActionsCallbackInterfaces = new List<IPlayerInputActions>();
     private readonly InputAction m_PlayerInput_WASDMovement;
+    private readonly InputAction m_PlayerInput_Jump;
     public struct PlayerInputActions
     {
         private @FPInput m_Wrapper;
         public PlayerInputActions(@FPInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @WASDMovement => m_Wrapper.m_PlayerInput_WASDMovement;
+        public InputAction @Jump => m_Wrapper.m_PlayerInput_Jump;
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -186,6 +209,9 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
             @WASDMovement.started += instance.OnWASDMovement;
             @WASDMovement.performed += instance.OnWASDMovement;
             @WASDMovement.canceled += instance.OnWASDMovement;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
         }
 
         private void UnregisterCallbacks(IPlayerInputActions instance)
@@ -193,6 +219,9 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
             @WASDMovement.started -= instance.OnWASDMovement;
             @WASDMovement.performed -= instance.OnWASDMovement;
             @WASDMovement.canceled -= instance.OnWASDMovement;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
         }
 
         public void RemoveCallbacks(IPlayerInputActions instance)
@@ -213,5 +242,6 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
     public interface IPlayerInputActions
     {
         void OnWASDMovement(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
     }
 }

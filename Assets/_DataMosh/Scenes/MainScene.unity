@@ -6766,12 +6766,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sensitivity: 90
-  _movementSpeed: 55
+  _movementSpeed: 73
   _groundDrag: 3.8
-  _airDrag: 3
+  _airDrag: 3.75
+  _jumpForce: 20
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  _gravity: 39
   _isGrounded: 0
 --- !u!114 &709368782
 MonoBehaviour:
@@ -6786,6 +6788,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveInput: {x: 0, y: 0}
+  _jumpPressed: 0
 --- !u!54 &709368783
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6820,7 +6823,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 709368774}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: ebdfbbe7a0fed09478766db8aa607292, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
