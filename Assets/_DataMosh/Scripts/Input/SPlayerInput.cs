@@ -3,8 +3,10 @@ using UnityEngine.InputSystem;
 
 public class SPlayerInput : MonoBehaviour
 {
-    public Vector2 MoveInput;
     private FPInput _inputActions;
+
+    public Vector2 MoveInput;
+
     private InputAction _MovementAction;
 
     private void Awake()

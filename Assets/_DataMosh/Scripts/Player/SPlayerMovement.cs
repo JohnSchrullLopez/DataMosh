@@ -4,64 +4,79 @@ using UnityEngine.PlayerLoop;
 
 public class SPlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float _moveSpeed;
-    [SerializeField] private float _mouseSensitivity;
-    
-    private Camera _mainCamera;
-    private Transform _playerTransform;
-    private CharacterController _characterController;
-    private SPlayerInput _playerInput;
+    [Header("Player Settings")]
+    [SerializeField] private float _sensitivity = 1.0f;
+    [SerializeField] private float _movementSpeed = 1.0f;
+    [Header("Player Physics")]
+    [SerializeField] private float _groundDrag = 5f;
+    [SerializeField] private float _airDrag = 2f;
+    [SerializeField] private LayerMask _groundLayerMask;
 
-    private Vector3 _movementInput;
-    private Vector2 _camInput;
-    private float _gravity = -9.81f;
-    private float _yVelocity;
-    private Vector2 _currentCameraRotation;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private SPlayerInput _input;
+    private Transform _orientation;
+    private Transform _camera;
+    private Vector3 _movementDirection;
+    private Rigidbody _playerRB;
+    public bool _isGrounded = false;
+    private float yRotation = 0.0f;
+    private float xRotation = 0.0f;
+    private float _playerHeight = 2f;
+
+    private void Awake()
     {
-        _characterController = GetComponent<CharacterController>();
-        _mainCamera = GetComponentInChildren<Camera>();
-        _playerInput = GetComponent<SPlayerInput>();
-        _playerTransform = GetComponent<Transform>();
+        _camera = GameObject.FindGameObjectWithTag("MainCamera").transform;
+        _playerRB = GetComponent<Rigidbody>();
+        _input = GetComponent<SPlayerInput>();
+        _orientation = transform.GetChild(0).GetComponent<Transform>();
+
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        UpdateMovement();
-        GetCameraInput();
+        MoveCamera();
+        HandleDrag();
+        Debug.Log(_playerRB.linearVelocity);
     }
 
-    private void GetCameraInput()
+    private void HandleDrag()
     {
-        //Get mouse movement each frame and add result to the transform's rotation
-        _camInput = new Vector2(Input.GetAxis("Mouse X") * _mouseSensitivity * Time.deltaTime, Input.GetAxis("Mouse Y") * _mouseSensitivity * Time.deltaTime);
-        _currentCameraRotation += _camInput;
-        
-        //Horizontal cam movement
-        transform.localRotation = Quaternion.AngleAxis(_currentCameraRotation.x, Vector3.up);
-        //Vertical cam movement
-        _mainCamera.transform.localRotation = Quaternion.AngleAxis(-_currentCameraRotation.y, Vector3.right);
-    }
+        _isGrounded = Physics.Raycast(transform.position, Vector3.down, _playerHeight * 0.5f + 0.2f, _groundLayerMask);
 
-    private void UpdateMovement()
-    {
-        //Gravity
-        if (_characterController.isGrounded && _yVelocity < 0)
+        if (_isGrounded)
         {
-            _yVelocity = 0f;
+            _playerRB.linearDamping = _groundDrag;
         }
-        _yVelocity += _gravity * Time.deltaTime;
+        else
+        {
+            _playerRB.linearDamping = _airDrag;
+        }
+    }
 
-        //WASD movement
-        /*_movementInput = new Vector3(Input.GetAxis("Horizontal"), _yVelocity, Input.GetAxis("Vertical"));
-        _movementInput = _playerTransform.TransformDirection(_movementInput);*/
+    private void FixedUpdate()
+    {
+        MovePlayer();
+    }
 
-        _movementInput = new Vector3(_playerInput.MoveInput.x, _yVelocity, _playerInput.MoveInput.y);
-        _movementInput = _playerTransform.TransformDirection(_movementInput);
-        _characterController.Move(_movementInput * _moveSpeed * Time.deltaTime);
+    private void MovePlayer()
+    {
+        _movementDirection = _orientation.forward * _input.MoveInput.y + _orientation.right * _input.MoveInput.x;
+
+        _playerRB.AddForce(_movementDirection * _movementSpeed, ForceMode.Force);
+    }
+
+    private void MoveCamera()
+    {
+        yRotation += Input.GetAxisRaw("Mouse X") * Time.deltaTime * _sensitivity;
+        xRotation -= Input.GetAxisRaw("Mouse Y") * Time.deltaTime * _sensitivity;
+        xRotation = Mathf.Clamp(xRotation, -90.0f, 90.0f);
+
+        _camera.rotation = Quaternion.Euler(xRotation, yRotation, 0);
+        _orientation.rotation = Quaternion.Euler(0, yRotation, 0);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Debug.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - (_playerHeight * 0.5f + 0.2f), transform.position.z), Color.red, 1f);
     }
 }
