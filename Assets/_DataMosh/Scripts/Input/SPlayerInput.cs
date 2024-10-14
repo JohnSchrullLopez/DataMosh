@@ -1,32 +1,48 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class SPlayerInput : MonoBehaviour
 {
     private FPInput _inputActions;
 
     public Vector2 MoveInput;
-    public bool _jumpPressed = false;
+    public bool JumpPressed = false;
+    public bool Sliding = false;
+    public bool SlideStarted = false;
 
-    private InputAction _MovementAction;
-    private InputAction _JumpAction;
+    private InputAction _movementAction;
+    private InputAction _jumpAction;
+    private InputAction _slideAction;
 
     private void Awake()
     {
         _inputActions = new FPInput();
         _inputActions.Enable();
 
-        _MovementAction = _inputActions.FindAction("WASD Movement");
-        _JumpAction = _inputActions.FindAction("Jump");
+        _movementAction = _inputActions.FindAction("WASD Movement");
+        _jumpAction = _inputActions.FindAction("Jump");
+        _slideAction = _inputActions.FindAction("Slide");
 
-        _JumpAction.started += (context =>
+        _jumpAction.started += (context =>
         {
-            _jumpPressed = true;
+            JumpPressed = true;
+        });
+
+        _slideAction.started += (context =>
+        {
+            Sliding = true;
+            SlideStarted = true;
+        });
+
+        _slideAction.canceled += (context =>
+        {
+            Sliding = false;
         });
     }
 
     private void Update()
     {
-        MoveInput = _MovementAction.ReadValue<Vector2>();
+        MoveInput = _movementAction.ReadValue<Vector2>();
     }
 }

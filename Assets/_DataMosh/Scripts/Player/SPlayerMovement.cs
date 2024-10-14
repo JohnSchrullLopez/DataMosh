@@ -10,9 +10,12 @@ public class SPlayerMovement : MonoBehaviour
     [Header("Player Physics")]
     [SerializeField] private float _groundDrag = 5f;
     [SerializeField] private float _airDrag = 2f;
+    [SerializeField] private float _slideDrag = 0.1f;
+    [SerializeField, Range(0, 1)] private float _airControl = .2f;
     [SerializeField] private float _jumpForce = 10f;
     [SerializeField] private LayerMask _groundLayerMask;
     [SerializeField] private float _gravity = 9.81f;
+    [SerializeField] private float _slideBoost = 2f;
 
     private SPlayerInput _input;
     private Transform _orientation;
@@ -20,6 +23,7 @@ public class SPlayerMovement : MonoBehaviour
     private Vector3 _movementDirection;
     private Rigidbody _playerRB;
     public bool _isGrounded = false;
+    //private bool _slideStarted = false;
     private float yRotation = 0.0f;
     private float xRotation = 0.0f;
     private float _playerHeight = 2f;
@@ -45,10 +49,10 @@ public class SPlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        if (_input._jumpPressed && _isGrounded)
+        if (_input.JumpPressed && _isGrounded)
         {
             _playerRB.AddForce(_orientation.up * _jumpForce, ForceMode.Impulse);
-            _input._jumpPressed = false;
+            _input.JumpPressed = false;
         }
     }
 
@@ -56,7 +60,11 @@ public class SPlayerMovement : MonoBehaviour
     {
         GroundCheck();
 
-        if (_isGrounded)
+        if (_input.Sliding && _isGrounded)
+        {
+            _playerRB.linearDamping = _slideDrag;
+        }
+        else if (_isGrounded)
         {
             _playerRB.linearDamping = _groundDrag;
         }
@@ -80,7 +88,24 @@ public class SPlayerMovement : MonoBehaviour
     {
         _movementDirection = _orientation.forward * _input.MoveInput.y + _orientation.right * _input.MoveInput.x;
 
-        _playerRB.AddForce(_movementDirection * _movementSpeed, ForceMode.Force);
+        if (_input.Sliding && _isGrounded)
+        {
+            if (_input.SlideStarted)
+            {
+                _playerRB.linearVelocity = _playerRB.linearVelocity * _slideBoost;
+                _input.SlideStarted = false;
+            }
+            return;
+        }
+        
+        if (_isGrounded)
+        {
+            _playerRB.AddForce(_movementDirection * _movementSpeed, ForceMode.Force);
+        }
+        else
+        {
+            _playerRB.AddForce(_movementDirection * (_movementSpeed * _airControl), ForceMode.Force);
+        }
     }
 
     private void MoveCamera()

@@ -47,7 +47,7 @@ public class SDataMoshEffect : MonoBehaviour
     private void Update()
     {
         //Set lerp value in shader to toggle effect
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetMouseButtonDown(0))
         {
             _transitioningInto = !_transitioningInto;
         }
