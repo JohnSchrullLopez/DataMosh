@@ -10,10 +10,12 @@ public class SPlayerInput : MonoBehaviour
     public bool JumpPressed = false;
     public bool Sliding = false;
     public bool SlideStarted = false;
+    public bool Dashing = false;
 
     private InputAction _movementAction;
     private InputAction _jumpAction;
     private InputAction _slideAction;
+    private InputAction _dashAction;
 
     private void Awake()
     {
@@ -23,6 +25,7 @@ public class SPlayerInput : MonoBehaviour
         _movementAction = _inputActions.FindAction("WASD Movement");
         _jumpAction = _inputActions.FindAction("Jump");
         _slideAction = _inputActions.FindAction("Slide");
+        _dashAction = _inputActions.FindAction("Dash");
 
         _jumpAction.started += (context =>
         {
@@ -39,10 +42,30 @@ public class SPlayerInput : MonoBehaviour
         {
             Sliding = false;
         });
+
+        _dashAction.started += (context =>
+        {
+            Dashing = true;
+        });
     }
 
     private void Update()
     {
         MoveInput = _movementAction.ReadValue<Vector2>();
+    }
+
+    public void SetSlideStarted(bool started)
+    {
+        SlideStarted = started;
+    }
+
+    public void SetSliding(bool sliding)
+    {
+        Sliding = sliding;
+    }
+
+    public void SetDashing(bool dashing)
+    {
+        Dashing = dashing;
     }
 }

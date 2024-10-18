@@ -54,6 +54,15 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Dash"",
+                    ""type"": ""Button"",
+                    ""id"": ""b4496ac3-2eac-49bf-82f6-2566d538f252"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -133,6 +142,17 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
                     ""action"": ""Slide"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f21e2c3d-c92c-4227-8134-31382e4fe14e"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -144,6 +164,7 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
         m_PlayerInput_WASDMovement = m_PlayerInput.FindAction("WASD Movement", throwIfNotFound: true);
         m_PlayerInput_Jump = m_PlayerInput.FindAction("Jump", throwIfNotFound: true);
         m_PlayerInput_Slide = m_PlayerInput.FindAction("Slide", throwIfNotFound: true);
+        m_PlayerInput_Dash = m_PlayerInput.FindAction("Dash", throwIfNotFound: true);
     }
 
     ~@FPInput()
@@ -213,6 +234,7 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_WASDMovement;
     private readonly InputAction m_PlayerInput_Jump;
     private readonly InputAction m_PlayerInput_Slide;
+    private readonly InputAction m_PlayerInput_Dash;
     public struct PlayerInputActions
     {
         private @FPInput m_Wrapper;
@@ -220,6 +242,7 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
         public InputAction @WASDMovement => m_Wrapper.m_PlayerInput_WASDMovement;
         public InputAction @Jump => m_Wrapper.m_PlayerInput_Jump;
         public InputAction @Slide => m_Wrapper.m_PlayerInput_Slide;
+        public InputAction @Dash => m_Wrapper.m_PlayerInput_Dash;
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -238,6 +261,9 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
             @Slide.started += instance.OnSlide;
             @Slide.performed += instance.OnSlide;
             @Slide.canceled += instance.OnSlide;
+            @Dash.started += instance.OnDash;
+            @Dash.performed += instance.OnDash;
+            @Dash.canceled += instance.OnDash;
         }
 
         private void UnregisterCallbacks(IPlayerInputActions instance)
@@ -251,6 +277,9 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
             @Slide.started -= instance.OnSlide;
             @Slide.performed -= instance.OnSlide;
             @Slide.canceled -= instance.OnSlide;
+            @Dash.started -= instance.OnDash;
+            @Dash.performed -= instance.OnDash;
+            @Dash.canceled -= instance.OnDash;
         }
 
         public void RemoveCallbacks(IPlayerInputActions instance)
@@ -273,5 +302,6 @@ public partial class @FPInput: IInputActionCollection2, IDisposable
         void OnWASDMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnSlide(InputAction.CallbackContext context);
+        void OnDash(InputAction.CallbackContext context);
     }
 }
