@@ -17,6 +17,7 @@ public class AttachCamera : MonoBehaviour
     void Update()
     {
         transform.position = _followPosition.position;
+        transform.rotation = _followPosition.rotation;
     }
 
     public void MoveToSlidePosition()

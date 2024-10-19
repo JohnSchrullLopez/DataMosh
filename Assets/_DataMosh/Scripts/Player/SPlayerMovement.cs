@@ -26,12 +26,17 @@ public class SPlayerMovement : MonoBehaviour
     private Vector3 _movementDirection;
     private Rigidbody _playerRB;
     public bool _isGrounded = false;
-    private bool _wallRunning = false;
-    private bool _wallLeft = false;
-    private bool _wallRight = false;
     private float yRotation = 0.0f;
     private float xRotation = 0.0f;
     private float _playerHeight = 2f;
+
+    //Wall Running
+    private bool _wallRunning = false;
+    private bool _wallLeft = false;
+    private RaycastHit _wallLeftHit;
+    private bool _wallRight = false;
+    private RaycastHit _wallRightHit;
+    private float _wallRunSpeed;
 
     private void Awake()
     {
@@ -137,22 +142,29 @@ public class SPlayerMovement : MonoBehaviour
 
     private void CheckForWalls()
     {
-        _wallLeft = Physics.Raycast(transform.position, -_orientation.right, 1f, _wallLayerMask);
-        _wallRight = Physics.Raycast(transform.position, _orientation.right, 1f, _wallLayerMask);
+        _wallLeft = Physics.Raycast(transform.position, -_orientation.right, out _wallLeftHit, 1f, _wallLayerMask);
+        _wallRight = Physics.Raycast(transform.position, _orientation.right, out _wallRightHit, 1f, _wallLayerMask);
     }
 
-    private void WallRun()
+    private void WallRun(bool startWallRun = false)
     {
+        //Set wall run velocity if wall run has just started
+        if (!_wallRunning)
+        {
+            _wallRunSpeed = _playerRB.linearVelocity.magnitude / 1.5f;
+        }
+
         _playerRB.useGravity = false;
-        _playerRB.linearVelocity = Vector3.zero;
-        _playerRB.AddForce(_orientation.forward * 500, ForceMode.Force);
+        //_playerRB.linearVelocity = Vector3.zero;
 
         if (_wallLeft)
         {
+            _playerRB.linearVelocity = Vector3.Cross(-_orientation.up, _wallLeftHit.normal) * _wallRunSpeed;
             _playerRB.AddForce(-_orientation.right * 10 * Time.deltaTime);
         }
         else
         {
+            _playerRB.linearVelocity = Vector3.Cross(_orientation.up, _wallRightHit.normal) * _wallRunSpeed;
             _playerRB.AddForce(_orientation.right * 10 * Time.deltaTime);
         }
     }
