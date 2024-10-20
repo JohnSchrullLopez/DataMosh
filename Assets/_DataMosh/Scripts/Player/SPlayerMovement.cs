@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
+//TODO: Add cooldown to dash
+
 public class SPlayerMovement : MonoBehaviour
 {
     [Header("Player Settings")]
@@ -31,12 +33,15 @@ public class SPlayerMovement : MonoBehaviour
     private float _playerHeight = 2f;
 
     //Wall Running
+    [SerializeField] float _wallRunJumpForce = 15f;
     private bool _wallRunning = false;
     private bool _wallLeft = false;
     private RaycastHit _wallLeftHit;
     private bool _wallRight = false;
     private RaycastHit _wallRightHit;
     private float _wallRunSpeed;
+    private float _wallRunCooldownCurrent = 0f;
+    private float _wallRunCooldownMax = .15f;
 
     private void Awake()
     {
@@ -54,8 +59,15 @@ public class SPlayerMovement : MonoBehaviour
         MoveCamera();
         ApplyDrag();
         Jump();
+        HandleCooldowns();
 
         Physics.gravity = new Vector3(0, -_gravity, 0);
+    }
+
+    private void HandleCooldowns()
+    {
+        if (_wallRunCooldownCurrent > 0) { _wallRunCooldownCurrent -= Time.deltaTime; }
+        Debug.Log(_wallRunCooldownCurrent);
     }
 
     private void Jump()
@@ -142,11 +154,14 @@ public class SPlayerMovement : MonoBehaviour
 
     private void CheckForWalls()
     {
-        _wallLeft = Physics.Raycast(transform.position, -_orientation.right, out _wallLeftHit, 1f, _wallLayerMask);
-        _wallRight = Physics.Raycast(transform.position, _orientation.right, out _wallRightHit, 1f, _wallLayerMask);
+        if (_wallRunCooldownCurrent <= 0)
+        {
+            _wallLeft = Physics.Raycast(transform.position, -_orientation.right, out _wallLeftHit, 1f, _wallLayerMask);
+            _wallRight = Physics.Raycast(transform.position, _orientation.right, out _wallRightHit, 1f, _wallLayerMask);
+        }
     }
 
-    private void WallRun(bool startWallRun = false)
+    private void WallRun()
     {
         //Set wall run velocity if wall run has just started
         if (!_wallRunning)
@@ -161,12 +176,32 @@ public class SPlayerMovement : MonoBehaviour
         {
             _playerRB.linearVelocity = Vector3.Cross(-_orientation.up, _wallLeftHit.normal) * _wallRunSpeed;
             _playerRB.AddForce(-_orientation.right * 10 * Time.deltaTime);
+            if (_input.JumpPressed) 
+            {
+                _wallRunCooldownCurrent = _wallRunCooldownMax;
+                WallRunJump(_wallLeftHit); 
+            }
         }
         else
         {
             _playerRB.linearVelocity = Vector3.Cross(_orientation.up, _wallRightHit.normal) * _wallRunSpeed;
             _playerRB.AddForce(_orientation.right * 10 * Time.deltaTime);
+            if (_input.JumpPressed) 
+            { 
+                _wallRunCooldownCurrent = _wallRunCooldownMax;
+                WallRunJump(_wallRightHit);
+            }
         }
+    }
+
+    private void WallRunJump(RaycastHit wall)
+    {
+        Vector3 jumpVector = (wall.normal + _playerRB.linearVelocity / 4f).normalized * _wallRunJumpForce;
+        jumpVector += new Vector3(0, 15, 0);
+        _playerRB.AddForce(jumpVector, ForceMode.Impulse);
+        _input.JumpPressed = false;
+        _wallLeft = false;
+        _wallRight = false;
     }
 
     private void Slide()
