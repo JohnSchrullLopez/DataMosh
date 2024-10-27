@@ -13,6 +13,7 @@ public class SPlayerMovement : MonoBehaviour
     [SerializeField] private float _slideBoost = 2f;
     [SerializeField, Range(0, 1)] private float _airControl = .2f;
     [SerializeField] private float _dashForce = 1f;
+
     [Header("Player Physics")]
     [SerializeField] private float _groundDrag = 5f;
     [SerializeField] private float _airDrag = 2f;
@@ -67,7 +68,6 @@ public class SPlayerMovement : MonoBehaviour
     private void HandleCooldowns()
     {
         if (_wallRunCooldownCurrent > 0) { _wallRunCooldownCurrent -= Time.deltaTime; }
-        Debug.Log(_wallRunCooldownCurrent);
     }
 
     private void Jump()

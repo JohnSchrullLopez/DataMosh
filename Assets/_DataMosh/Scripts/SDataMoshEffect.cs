@@ -10,6 +10,7 @@ public class SDataMoshEffect : MonoBehaviour
     public Material DMMat;
     public RawImage DebugImage;
     private RenderTexture _objectMask;
+    private RenderTexture _topMask;
     private RenderTexture _buffer;
     private int _intensityID;
     private int _prevID;
@@ -31,17 +32,19 @@ public class SDataMoshEffect : MonoBehaviour
         this.GetComponent<Camera>().depthTextureMode = DepthTextureMode.MotionVectors;
         _buffer = new RenderTexture(Screen.width, Screen.height, 16);
         _objectMask = new RenderTexture(Camera.main.pixelWidth, Camera.main.pixelHeight, 16);
-        
+        _topMask = new RenderTexture(Camera.main.pixelWidth, Camera.main.pixelHeight, 16);
+
         //Cache property IDs and initialize
         _intensityID = Shader.PropertyToID("_DMIntensity");    
         _prevID = Shader.PropertyToID("_Prev");
         Shader.SetGlobalInteger("_BlockSize", _BlockSize);
         Shader.SetGlobalFloat("_PerBlockNoise", _PerBlockNoise);
         Shader.SetGlobalFloat("_BlockDecay", _BlockDecay);
-        
+
         //Debugging
         transform.GetChild(0).GetComponent<Camera>().targetTexture = _objectMask;
-        DebugImage.texture = _objectMask;
+        transform.GetChild(1).GetComponent<Camera>().targetTexture = _topMask;
+        DebugImage.texture = _topMask;
     }
 
     private void Update()
@@ -66,6 +69,7 @@ public class SDataMoshEffect : MonoBehaviour
         //Send previous frame and object mask to shader
         Shader.SetGlobalTexture(_prevID, _buffer);
         Shader.SetGlobalTexture("_Mask", _objectMask);
+        Shader.SetGlobalTexture("_Top", _topMask);
         
         //Run shader on current frame
         Graphics.Blit(source, destination, DMMat);

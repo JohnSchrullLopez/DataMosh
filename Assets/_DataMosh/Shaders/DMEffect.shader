@@ -76,6 +76,7 @@ Shader "Custom/DMEffect"
             sampler2D _CameraMotionVectorsTexture;
             sampler2D _CameraDepthTexture;
             sampler2D _Mask;
+            sampler2D _Top;
             sampler2D _Prev;
             
             float _DMIntensity;
@@ -92,10 +93,14 @@ Shader "Custom/DMEffect"
                 float4 mot = tex2D(_CameraMotionVectorsTexture,uvr);
                 float4 depth = tex2D(_CameraDepthTexture, i.uv);
                 float4 mask = tex2D(_Mask, i.uv);
+                float4 top = tex2D(_Top, i.uv);
+
+                //Render selected objects on top of masked dm objects
+                mask.a = lerp(mask.a, 0, top.a);
 
                 //add noise to individual blocks
                 float n = random(_Time.x * (uvr.x+uvr.y*_ScreenParams.x));
-                mot=max(abs(mot)-round(n/_PerBlockNoise),0)*sign(mot);
+                mot=max(abs(mot)-round(n/_PerBlockNoise),0)*sign(mot); 
                 
                 //Fix coordinate differences between graphics APIs
                 //Displace uv coordinates by intensity of Motion texture
@@ -116,8 +121,7 @@ Shader "Custom/DMEffect"
                 //DOF BASED
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), 1 - depth.r);
 
-                //lerp applies different effect based on mask
-                fixed4 col = lerp(lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity), tex2D(_Prev, mvuv), tex2D(_Mask, i.uv).a);
+                fixed4 col = lerp(lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity), tex2D(_Prev, mvuv), mask.a);
                 //fixed4 col = lerp(lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity), tex2D(_Prev, mvuv), lerp(round(1-(n)/1.4),1, tex2D(_Mask, i.uv).a));
                 return col;
             }
