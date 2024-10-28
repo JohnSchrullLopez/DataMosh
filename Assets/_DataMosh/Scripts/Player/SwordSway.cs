@@ -9,8 +9,8 @@ public class SwordSway : MonoBehaviour
 
     private void Update()
     {
-        //transform.position = Vector3.SmoothDamp(transform.position, _target.TransformPoint(Vector3.zero), ref _velocity, _smoothTime); ;
-        //transform.rotation = Quaternion.Slerp(transform.rotation, _target.rotation, speed * Time.deltaTime);
+        /*transform.position = Vector3.SmoothDamp(transform.position, _target.TransformPoint(Vector3.zero), ref _velocity, _smoothTime); ;
+        transform.rotation = Quaternion.Slerp(transform.rotation, _target.rotation, speed * Time.deltaTime);*/
 
         transform.position = Vector3.SlerpUnclamped(transform.position, _target.position, speed * Time.deltaTime);
         transform.rotation = Quaternion.Slerp(transform.rotation, _target.rotation, speed * Time.deltaTime);

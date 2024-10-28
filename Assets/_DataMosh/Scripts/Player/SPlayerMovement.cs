@@ -13,7 +13,9 @@ public class SPlayerMovement : MonoBehaviour
     [SerializeField] private float _slideBoost = 2f;
     [SerializeField, Range(0, 1)] private float _airControl = .2f;
     [SerializeField] private float _dashForce = 1f;
-
+    [SerializeField] private float _maxSpeed = 25f;
+    [SerializeField] private float _wallJumpHeight = 20f;
+    
     [Header("Player Physics")]
     [SerializeField] private float _groundDrag = 5f;
     [SerializeField] private float _airDrag = 2f;
@@ -61,8 +63,19 @@ public class SPlayerMovement : MonoBehaviour
         ApplyDrag();
         Jump();
         HandleCooldowns();
-
+        CapSpeed();
+        
+        //Debug.Log(_playerRB.linearVelocity.magnitude);
         Physics.gravity = new Vector3(0, -_gravity, 0);
+    }
+
+    private void CapSpeed()
+    {
+        if (_playerRB.linearVelocity.magnitude > _maxSpeed && !_input.Sliding)
+        {
+            Debug.Log("Capping");
+            _playerRB.AddForce(-_playerRB.linearVelocity, ForceMode.Force);
+        }
     }
 
     private void HandleCooldowns()
@@ -166,11 +179,10 @@ public class SPlayerMovement : MonoBehaviour
         //Set wall run velocity if wall run has just started
         if (!_wallRunning)
         {
-            _wallRunSpeed = _playerRB.linearVelocity.magnitude / 1.5f;
+            _wallRunSpeed = _playerRB.linearVelocity.magnitude; // 1.5f;
         }
 
         _playerRB.useGravity = false;
-        //_playerRB.linearVelocity = Vector3.zero;
 
         if (_wallLeft)
         {
@@ -197,7 +209,7 @@ public class SPlayerMovement : MonoBehaviour
     private void WallRunJump(RaycastHit wall)
     {
         Vector3 jumpVector = (wall.normal + _playerRB.linearVelocity / 4f).normalized * _wallRunJumpForce;
-        jumpVector += new Vector3(0, 15, 0);
+        jumpVector += new Vector3(0, _wallJumpHeight, 0);
         _playerRB.AddForce(jumpVector, ForceMode.Impulse);
         _input.JumpPressed = false;
         _wallLeft = false;
