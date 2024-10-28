@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - RenderTexture
+  - Enemy
   layers:
   - Default
   - TransparentFX
