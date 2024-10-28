@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
-using System.Collections;
 
 public class SDataMoshEffect : MonoBehaviour
 {
@@ -35,7 +33,7 @@ public class SDataMoshEffect : MonoBehaviour
         _topMask = new RenderTexture(Camera.main.pixelWidth, Camera.main.pixelHeight, 16);
 
         //Cache property IDs and initialize
-        _intensityID = Shader.PropertyToID("_DMIntensity");    
+        _intensityID = Shader.PropertyToID("_DMIntensity");
         _prevID = Shader.PropertyToID("_Prev");
         Shader.SetGlobalInteger("_BlockSize", _BlockSize);
         Shader.SetGlobalFloat("_PerBlockNoise", _PerBlockNoise);
@@ -44,13 +42,13 @@ public class SDataMoshEffect : MonoBehaviour
         //Debugging
         transform.GetChild(0).GetComponent<Camera>().targetTexture = _objectMask;
         transform.GetChild(1).GetComponent<Camera>().targetTexture = _topMask;
-        DebugImage.texture = _topMask;
+        DebugImage.texture = Camera.main.targetTexture;
     }
 
     private void Update()
     {
         //Set lerp value in shader to toggle effect
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             _transitioningInto = !_transitioningInto;
         }
@@ -65,15 +63,15 @@ public class SDataMoshEffect : MonoBehaviour
         {
             _buffer = new RenderTexture(Screen.width, Screen.height, 16);
         }
-        
+
         //Send previous frame and object mask to shader
         Shader.SetGlobalTexture(_prevID, _buffer);
         Shader.SetGlobalTexture("_Mask", _objectMask);
         Shader.SetGlobalTexture("_Top", _topMask);
-        
+
         //Run shader on current frame
         Graphics.Blit(source, destination, DMMat);
-        
+
         //Store output into buffer to use as previous frame in next iteration
         //Active render texture is null so it renders directly to main window.
         RenderTexture.active = Camera.main.targetTexture;

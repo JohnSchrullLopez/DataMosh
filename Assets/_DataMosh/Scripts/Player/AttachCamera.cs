@@ -14,7 +14,7 @@ public class AttachCamera : MonoBehaviour
         _camSlideLocation = GameObject.FindGameObjectWithTag("Player").transform.GetChild(2).GetComponent<Transform>();
     }
 
-    void Update()
+    void LateUpdate()
     {
         transform.position = _followPosition.position;
     }
