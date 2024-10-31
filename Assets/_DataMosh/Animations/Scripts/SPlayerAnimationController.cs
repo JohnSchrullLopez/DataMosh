@@ -16,7 +16,6 @@ public class SPlayerAnimationController : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(_input.Attacking);
         if (_input.Attacking)
         {
             PlayAttack();

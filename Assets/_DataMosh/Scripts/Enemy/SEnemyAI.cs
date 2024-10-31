@@ -7,22 +7,25 @@ public class SEnemyAI : MonoBehaviour
     [SerializeField] private GameObject _bulletPrefab;
     [SerializeField] private float _shootCooldown = 1f;
     [SerializeField] private float _bulletForce = 100f;
+    private float _currentCooldown = 1f;
     private bool _playerInRange = false;
     private Transform _player;
+    private Transform _bulletSpawnPoint;
 
     private void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
+        _currentCooldown = _shootCooldown;
+        _bulletSpawnPoint = transform.GetChild(0).GetChild(0);
     }
 
     private void Update()
     {
-        Debug.Log(_shootCooldown);
-
-        if (_shootCooldown > 0) _shootCooldown -= Time.deltaTime;
+        Debug.Log(_currentCooldown);
         
         if (_playerInRange)
         {
+            if (_currentCooldown > 0) _currentCooldown -= Time.deltaTime;
             TargetPlayer();
             Shoot();
         }
@@ -30,11 +33,15 @@ public class SEnemyAI : MonoBehaviour
 
     private void Shoot()
     {
-        if (_shootCooldown <= 0)
+        if (_currentCooldown <= 0)
         {
-            GameObject bullet = Instantiate(_bulletPrefab, transform.position, transform.rotation);
-            bullet.GetComponent<Rigidbody>().AddForce(_bulletForce * transform.forward, ForceMode.Impulse);
-            _shootCooldown = 5f;
+            GameObject bullet = BulletPool.Instance.SpawnBullet(_bulletSpawnPoint.position, _bulletSpawnPoint.rotation);
+
+            if (bullet != null)
+            {
+                bullet.GetComponent<Rigidbody>().AddForce(_bulletForce * _bulletSpawnPoint.forward, ForceMode.Impulse);
+                _currentCooldown = _shootCooldown;
+            }
         }
     }
 
@@ -56,6 +63,7 @@ public class SEnemyAI : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             _playerInRange = false;
+            _currentCooldown = _shootCooldown;
         }
     }
 }

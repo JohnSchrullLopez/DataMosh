@@ -73,7 +73,6 @@ public class SPlayerMovement : MonoBehaviour
     {
         if (_playerRB.linearVelocity.magnitude > _maxSpeed && !_input.Sliding)
         {
-            Debug.Log("Capping");
             _playerRB.AddForce(-_playerRB.linearVelocity, ForceMode.Force);
         }
     }
