@@ -1,8 +1,9 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
-//TODO: Add cooldown to dash
+//TODO: Influence wall jump direction based on input, coyote time, dash cooldown
 
 public class SPlayerMovement : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class SPlayerMovement : MonoBehaviour
     [SerializeField] private float _dashForce = 1f;
     [SerializeField] private float _maxSpeed = 25f;
     [SerializeField] private float _wallJumpHeight = 20f;
+    [SerializeField] private float _wallRunVerticalSpeed = 5;
     
     [Header("Player Physics")]
     [SerializeField] private float _groundDrag = 5f;
@@ -65,7 +67,6 @@ public class SPlayerMovement : MonoBehaviour
         HandleCooldowns();
         CapSpeed();
         
-        //Debug.Log(_playerRB.linearVelocity.magnitude);
         Physics.gravity = new Vector3(0, -_gravity, 0);
     }
 
@@ -186,7 +187,8 @@ public class SPlayerMovement : MonoBehaviour
         if (_wallLeft)
         {
             _playerRB.linearVelocity = Vector3.Cross(-_orientation.up, _wallLeftHit.normal) * _wallRunSpeed;
-            _playerRB.AddForce(-_orientation.right * 10 * Time.deltaTime);
+            _playerRB.linearVelocity = new Vector3(_playerRB.linearVelocity.x, _wallRunVerticalSpeed, _playerRB.linearVelocity.z);
+            //_playerRB.AddForce(-_orientation.right * 10 * Time.deltaTime);
             if (_input.JumpPressed) 
             {
                 _wallRunCooldownCurrent = _wallRunCooldownMax;
@@ -196,7 +198,8 @@ public class SPlayerMovement : MonoBehaviour
         else
         {
             _playerRB.linearVelocity = Vector3.Cross(_orientation.up, _wallRightHit.normal) * _wallRunSpeed;
-            _playerRB.AddForce(_orientation.right * 10 * Time.deltaTime);
+            _playerRB.linearVelocity = new Vector3(_playerRB.linearVelocity.x, _wallRunVerticalSpeed, _playerRB.linearVelocity.z);
+            //_playerRB.AddForce(_orientation.right * 10 * Time.deltaTime);
             if (_input.JumpPressed) 
             { 
                 _wallRunCooldownCurrent = _wallRunCooldownMax;
@@ -245,7 +248,13 @@ public class SPlayerMovement : MonoBehaviour
         _orientation.rotation = Quaternion.Euler(0, yRotation, 0);
     }
 
-
+    public void DashToTarget(Transform target)
+    {
+        _playerRB.linearVelocity = Vector3.zero;
+        Vector3 direction = target.transform.position - transform.position;
+        //_playerRB.AddForce(direction.normalized * 10, ForceMode.Impulse);
+        transform.DOMove(target.position, 0.3f);
+    }
 
     private void OnDrawGizmos()
     {

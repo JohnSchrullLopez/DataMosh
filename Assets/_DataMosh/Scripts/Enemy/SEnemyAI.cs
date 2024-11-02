@@ -21,8 +21,6 @@ public class SEnemyAI : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(_currentCooldown);
-        
         if (_playerInRange)
         {
             if (_currentCooldown > 0) _currentCooldown -= Time.deltaTime;

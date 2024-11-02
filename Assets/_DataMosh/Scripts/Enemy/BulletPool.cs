@@ -43,7 +43,6 @@ public class BulletPool : MonoBehaviour
                 bullet.transform.position = position;
                 bullet.transform.rotation = rotation;
                 StartCoroutine(DespawnAfterSeconds(_despawnTime, bullet));
-                Debug.Log("Despawn timer started");
                 return bullet;
             }
         }
@@ -57,6 +56,5 @@ public class BulletPool : MonoBehaviour
         yield return new WaitForSecondsRealtime(seconds);
         bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
         bullet.SetActive(false);
-        Debug.Log("Despawn timer ended");
     }
 }
