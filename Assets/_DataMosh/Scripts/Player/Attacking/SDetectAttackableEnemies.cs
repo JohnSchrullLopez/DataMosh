@@ -17,11 +17,12 @@ public class SDetectAttackableEnemies : MonoBehaviour
 
     private void Update()
     {
-        if (_input.Attacking && _attackableEnemy != null)
+        if (_attackableEnemy == null) return;
+        
+        if (_input.Attacking && !_attackableEnemy.CompareTag("Dead Enemy"))
         {
             _movementScript.DashToTarget(_attackableEnemy.transform);
         }
-        Debug.Log(_attackableEnemy);
     }
 
     private void OnTriggerEnter(Collider other)

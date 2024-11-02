@@ -2,8 +2,9 @@ using System;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using UnityEngine.Serialization;
 
-//TODO: Influence wall jump direction based on input, coyote time, dash cooldown
+//TODO: Influence wall jump direction based on input
 
 public class SPlayerMovement : MonoBehaviour
 {
@@ -14,9 +15,12 @@ public class SPlayerMovement : MonoBehaviour
     [SerializeField] private float _slideBoost = 2f;
     [SerializeField, Range(0, 1)] private float _airControl = .2f;
     [SerializeField] private float _dashForce = 1f;
+    [FormerlySerializedAs("_dashCooldown")] [SerializeField] private float _dashCooldownMax = 2f;
     [SerializeField] private float _maxSpeed = 25f;
     [SerializeField] private float _wallJumpHeight = 20f;
     [SerializeField] private float _wallRunVerticalSpeed = 5;
+    [SerializeField] private float _coyoteTime = 0.2f;
+    [SerializeField] private float _coyoteTimeMax = 0.2f;
     
     [Header("Player Physics")]
     [SerializeField] private float _groundDrag = 5f;
@@ -47,6 +51,7 @@ public class SPlayerMovement : MonoBehaviour
     private float _wallRunSpeed;
     private float _wallRunCooldownCurrent = 0f;
     private float _wallRunCooldownMax = .15f;
+    private float _dashCooldownCurrent = 0f;
 
     private void Awake()
     {
@@ -66,8 +71,21 @@ public class SPlayerMovement : MonoBehaviour
         Jump();
         HandleCooldowns();
         CapSpeed();
-        
+        HandleCoyoteTime();
+
         Physics.gravity = new Vector3(0, -_gravity, 0);
+    }
+
+    private void HandleCoyoteTime()
+    {
+        if (_isGrounded)
+        {
+            _coyoteTime = _coyoteTimeMax;
+        }
+        else
+        {
+            _coyoteTime -= Time.deltaTime;
+        }
     }
 
     private void CapSpeed()
@@ -81,11 +99,12 @@ public class SPlayerMovement : MonoBehaviour
     private void HandleCooldowns()
     {
         if (_wallRunCooldownCurrent > 0) { _wallRunCooldownCurrent -= Time.deltaTime; }
+        if (_dashCooldownCurrent > 0 ) { _dashCooldownCurrent -= Time.deltaTime; }
     }
 
     private void Jump()
     {
-        if (_input.JumpPressed && _isGrounded)
+        if (_input.JumpPressed && _coyoteTime > 0)
         {
             _playerRB.AddForce(_orientation.up * _jumpForce, ForceMode.Impulse);
             _input.JumpPressed = false;
@@ -230,11 +249,12 @@ public class SPlayerMovement : MonoBehaviour
 
     private void Dash()
     {
-        if(_input.Dashing)
+        if(_input.Dashing && _dashCooldownCurrent <= 0)
         {
             _playerRB.linearVelocity = Vector3.zero;
             _playerRB.AddForce(_camera.forward * _dashForce, ForceMode.Impulse);
             _input.SetDashing(false);
+            _dashCooldownCurrent = _dashCooldownMax;
         }
     }
 

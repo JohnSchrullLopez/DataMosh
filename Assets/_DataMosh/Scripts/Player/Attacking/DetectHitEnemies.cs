@@ -5,6 +5,9 @@ public class DetectHitEnemies : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Enemy") Destroy(other.transform.root.gameObject);
+        if (other.gameObject.tag == "Enemy")
+        {
+            other.transform.parent.GetComponent<SKillEnemy>().KillEnemy();
+        }
     }
 }

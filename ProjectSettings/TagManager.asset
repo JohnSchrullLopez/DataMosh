@@ -6,6 +6,8 @@ TagManager:
   tags:
   - RenderTexture
   - Enemy
+  - Target Controller
+  - Dead Enemy
   layers:
   - Default
   - TransparentFX

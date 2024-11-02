@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class SDataMoshEffect : MonoBehaviour
 {
-    //TODO: Organize Code, Fix Object mask occlusion bug
+    private STargetController _targetController;
     public Material DMMat;
     public RawImage DebugImage;
     private RenderTexture _objectMask;
@@ -18,10 +18,12 @@ public class SDataMoshEffect : MonoBehaviour
     [SerializeField, Range(0, 1)] public float _intensityValue = 0.0f;
     private bool _transitioningInto = false;
     private float lerpVal = 0.0f;
+    private float lerpVelocity;
 
     private void Awake()
     {
         Application.targetFrameRate = 60;
+        _targetController = GameObject.FindGameObjectWithTag("Target Controller").GetComponent<STargetController>();
     }
 
     private void Start()
@@ -80,18 +82,19 @@ public class SDataMoshEffect : MonoBehaviour
 
     private void SmoothTransition()
     {
-        if (_transitioningInto)
+        /*if (_transitioningInto)
         {
-            //DOTween.To(() => _intensityValue, x => _intensityValue = x, 1f, 0.5f);
             lerpVal += Time.deltaTime * 0.5f;
         }
         else
         {
-            //DOTween.To(() => _intensityValue, x => _intensityValue = x, 0f, 5);
             lerpVal -= Time.deltaTime * 0.5f;
         }
 
-        lerpVal = Mathf.Clamp(lerpVal, 0.0f, 1.0f);
-        _intensityValue = Mathf.Lerp(0f, 1f, lerpVal);
+        lerpVal = Mathf.Clamp(lerpVal, 0.0f, 1.0f);*/
+        
+        float target = _targetController.GetDistanceToTarget();
+        lerpVal = Mathf.Lerp(lerpVal, target, Time.deltaTime * 2.5f);
+        _intensityValue = lerpVal;
     }
 }
