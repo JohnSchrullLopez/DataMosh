@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +21,9 @@ public class SDataMoshEffect : MonoBehaviour
     private bool _transitioningInto = false;
     private float lerpVal = 0.0f;
     private float lerpVelocity;
+    private bool _renderingPaused = false;
+    private bool _falling = false;
+    private bool _respawning = false;
 
     private void Awake()
     {
@@ -41,21 +46,15 @@ public class SDataMoshEffect : MonoBehaviour
         Shader.SetGlobalFloat("_PerBlockNoise", _PerBlockNoise);
         Shader.SetGlobalFloat("_BlockDecay", _BlockDecay);
 
-        //Debugging
+        //Render cameras into mask textures
         transform.GetChild(0).GetComponent<Camera>().targetTexture = _objectMask;
         transform.GetChild(1).GetComponent<Camera>().targetTexture = _topMask;
-        DebugImage.texture = Camera.main.targetTexture;
+        //DebugImage.texture = Camera.main.targetTexture;
     }
 
     private void Update()
     {
-        //Set lerp value in shader to toggle effect
-        if (Input.GetMouseButtonDown(1))
-        {
-            _transitioningInto = !_transitioningInto;
-        }
-
-        SmoothTransition();
+        EffectSmoothing();
         Shader.SetGlobalFloat(_intensityID, _intensityValue);
     }
 
@@ -66,6 +65,12 @@ public class SDataMoshEffect : MonoBehaviour
             _buffer = new RenderTexture(Screen.width, Screen.height, 16);
         }
 
+        if (_renderingPaused)
+        {
+            RenderTexture.active = _buffer;
+            return;
+        }
+        
         //Send previous frame and object mask to shader
         Shader.SetGlobalTexture(_prevID, _buffer);
         Shader.SetGlobalTexture("_Mask", _objectMask);
@@ -80,21 +85,39 @@ public class SDataMoshEffect : MonoBehaviour
         Graphics.Blit(RenderTexture.active, _buffer);
     }
 
-    private void SmoothTransition()
+    private void EffectSmoothing()
     {
-        /*if (_transitioningInto)
+        if (_falling && !_respawning)
         {
-            lerpVal += Time.deltaTime * 0.5f;
+            if (lerpVal >= 1)
+            {
+                StartCoroutine(RespawnPlayer());
+            }
+            lerpVal += Time.deltaTime * 2f;
+            lerpVal = Mathf.Clamp(lerpVal, 0, 1);
+            _intensityValue = lerpVal;
         }
-        else
+        else if (!_respawning)
         {
-            lerpVal -= Time.deltaTime * 0.5f;
+            float target = _targetController.GetDistanceToTarget();
+            lerpVal = Mathf.Lerp(lerpVal, target, Time.deltaTime * 1.5f);
+            _intensityValue = lerpVal;
         }
+    }
 
-        lerpVal = Mathf.Clamp(lerpVal, 0.0f, 1.0f);*/
-        
-        float target = _targetController.GetDistanceToTarget();
-        lerpVal = Mathf.Lerp(lerpVal, target, Time.deltaTime * 2.5f);
-        _intensityValue = lerpVal;
+    private IEnumerator RespawnPlayer()
+    {
+        _respawning = true;
+        _renderingPaused = true;
+        SPlayerSpawnManager.Instance.RespawnPlayer();
+        yield return new WaitForSecondsRealtime(0.5f);
+        _renderingPaused = false;
+        _respawning = false;
+        _falling = false;
+    }
+
+    public void SetFalling(bool value)
+    {
+        _falling = value;
     }
 }

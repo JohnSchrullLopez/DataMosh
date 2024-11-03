@@ -8,23 +8,20 @@ public class STargetController : MonoBehaviour
     [SerializeField] private float maxDistance = 50f;
     [SerializeField] private float minDistance = 10f;
     private Transform _playerTransform;
+    private GameObject _currentTarget;
 
     private void Start()
     {
         _playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         minDistance = minDistance / maxDistance;
-    }
-
-    private void Update()
-    {
-        Debug.Log(GetDistanceToTarget());
+        _currentTarget = targets[0];
     }
 
     public float GetDistanceToTarget()
     {
         if (targets.Count > 0)
         {
-            Vector3 distance = _playerTransform.position - targets[0].transform.position;
+            Vector3 distance = _playerTransform.position - _currentTarget.transform.position;
             return 1 - (Mathf.Clamp((distance.magnitude / maxDistance) - minDistance, 0, 1));
         }
         else
@@ -36,5 +33,14 @@ public class STargetController : MonoBehaviour
     public void RemoveTarget(GameObject target)
     {
         targets.Remove(target);
+        if (targets.Count > 0)
+        {
+            _currentTarget = targets[0];
+        }
+    }
+
+    public GameObject GetCurrentTarget()
+    {
+        return _currentTarget;
     }
 }

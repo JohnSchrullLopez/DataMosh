@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Target Controller
   - Dead Enemy
+  - Fall Trigger
   layers:
   - Default
   - TransparentFX
