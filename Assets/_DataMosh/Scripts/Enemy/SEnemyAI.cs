@@ -7,16 +7,16 @@ public class SEnemyAI : MonoBehaviour
     [SerializeField] private GameObject _bulletPrefab;
     [SerializeField] private float _shootCooldown = 1f;
     [SerializeField] private float _bulletForce = 100f;
+    [SerializeField] private Transform _rotationPoint;
     private float _currentCooldown = 1f;
     private bool _playerInRange = false;
     private Transform _player;
-    private Transform _bulletSpawnPoint;
+    [SerializeField] private Transform _bulletSpawnPoint;
 
     private void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
         _currentCooldown = _shootCooldown;
-        _bulletSpawnPoint = transform.GetChild(0).GetChild(0);
     }
 
     private void Update()
@@ -45,7 +45,7 @@ public class SEnemyAI : MonoBehaviour
 
     private void TargetPlayer()
     {
-        transform.LookAt(_player);
+        _rotationPoint.LookAt(_player, Vector3.up);
     }
 
     private void OnTriggerEnter(Collider other)

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 71e7c4ea82c1abd498e0af983fa01306
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 27858
+  packageName: Enemy Turrets
+  packageVersion: 1.0
+  assetPath: Assets/Models/Turret/Materials/GunPlat_2VRay1.mat
+  uploadId: 46556

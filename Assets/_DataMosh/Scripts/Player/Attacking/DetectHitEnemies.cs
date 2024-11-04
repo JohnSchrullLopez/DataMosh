@@ -12,9 +12,10 @@ public class DetectHitEnemies : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") && other.transform.parent.gameObject == _targetController.GetCurrentTarget())
+        if (other.CompareTag("Enemy") && other.transform.root.gameObject == _targetController.GetCurrentTarget())
         {
-            other.transform.parent.GetComponent<SKillEnemy>().KillEnemy();
+            other.transform.root.GetComponent<SKillEnemy>().KillEnemy();
+            other.enabled = false;
         }
     }
 }

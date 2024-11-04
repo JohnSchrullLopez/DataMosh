@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a4e65a28e38a0b043b0fa121b6c8d8e6
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 27858
+  packageName: Enemy Turrets
+  packageVersion: 1.0
+  assetPath: Assets/Models/Turret/Turret_test.unity
+  uploadId: 46556

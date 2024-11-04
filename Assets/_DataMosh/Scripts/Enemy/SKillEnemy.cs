@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SKillEnemy : MonoBehaviour
@@ -25,9 +26,15 @@ public class SKillEnemy : MonoBehaviour
         Destroy(_rigidBody);
         _targetCollider.enabled = false;
         _enemyAI.enabled = false;
-        this.gameObject.layer = _deadLayer;
         transform.GetChild(1).gameObject.tag = "Dead Enemy";
         _capsuleCollider.enabled = false;
         _targetController.RemoveTarget(this.gameObject);
+
+        var children = transform.root.GetComponentsInChildren<Transform>();
+        foreach (var child in children)
+        {
+            child.gameObject.layer = _deadLayer;
+            child.tag = "Dead Enemy";
+        }
     }
 }

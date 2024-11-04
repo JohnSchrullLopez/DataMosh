@@ -100,9 +100,11 @@ public class SDataMoshEffect : MonoBehaviour
         else if (!_respawning)
         {
             float target = _targetController.GetDistanceToTarget();
-            lerpVal = Mathf.Lerp(lerpVal, target, Time.deltaTime * 1.5f);
+            lerpVal = Mathf.Lerp(lerpVal, target, Time.deltaTime * 2.5f);
             _intensityValue = lerpVal;
         }
+        
+        Debug.Log(_intensityValue);
     }
 
     private IEnumerator RespawnPlayer()

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 285d02075c4d09442beccfa796f814a6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 27858
+  packageName: Enemy Turrets
+  packageVersion: 1.0
+  assetPath: Assets/Models/Turret/Materials/Gun_3VRay1.mat
+  uploadId: 46556
