@@ -15,7 +15,6 @@ public class SKillEnemy : MonoBehaviour
     {
         _rigidBody = GetComponent<Rigidbody>();
         _targetCollider = GetComponent<SphereCollider>();
-        _capsuleCollider = GetComponentInChildren<CapsuleCollider>();
         _enemyAI = GetComponent<SEnemyAI>();
         _targetController = GameObject.FindGameObjectWithTag("Target Controller").GetComponent<STargetController>();
         _deadLayer = LayerMask.NameToLayer("ObjectMask");
@@ -26,8 +25,6 @@ public class SKillEnemy : MonoBehaviour
         Destroy(_rigidBody);
         _targetCollider.enabled = false;
         _enemyAI.enabled = false;
-        transform.GetChild(1).gameObject.tag = "Dead Enemy";
-        _capsuleCollider.enabled = false;
         _targetController.RemoveTarget(this.gameObject);
 
         var children = transform.root.GetComponentsInChildren<Transform>();
