@@ -26,6 +26,7 @@ public class SEnemyAI : MonoBehaviour
             if (_currentCooldown > 0) _currentCooldown -= Time.deltaTime;
             TargetPlayer();
             Shoot();
+            
         }
     }
 
@@ -37,7 +38,10 @@ public class SEnemyAI : MonoBehaviour
 
             if (bullet != null)
             {
-                bullet.GetComponent<Rigidbody>().AddForce(_bulletForce * _bulletSpawnPoint.forward, ForceMode.Impulse);
+                Rigidbody rb = bullet.GetComponent<Rigidbody>();
+                /*rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;*/
+                rb.AddForce(_bulletForce * bullet.transform.forward, ForceMode.Impulse);
                 _currentCooldown = _shootCooldown;
             }
         }

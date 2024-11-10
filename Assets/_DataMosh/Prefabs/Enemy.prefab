@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1446892537287053690}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 51.4, y: -253.3, z: 41.1}
+  m_LocalPosition: {x: 24.5, y: -253, z: 1}
   m_LocalScale: {x: 102.93721, y: 17.244452, z: 51.209995}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -545,8 +545,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bulletPrefab: {fileID: 25868521032627854, guid: 4be5a4a86e8e72d438366cd070545471, type: 3}
-  _shootCooldown: 1
-  _bulletForce: 100
+  _shootCooldown: 0.5
+  _bulletForce: 35
   _rotationPoint: {fileID: 7151951273909836834}
   _bulletSpawnPoint: {fileID: 2253518907079357297}
 --- !u!114 &677549413734139842

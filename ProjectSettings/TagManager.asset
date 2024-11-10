@@ -9,6 +9,9 @@ TagManager:
   - Target Controller
   - Dead Enemy
   - Fall Trigger
+  - UICanvas
+  - StartScreen
+  - EndScreen
   layers:
   - Default
   - TransparentFX

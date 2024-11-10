@@ -42,7 +42,10 @@ public class BulletPool : MonoBehaviour
                 bullet.SetActive(true);
                 bullet.transform.position = position;
                 bullet.transform.rotation = rotation;
-                StartCoroutine(DespawnAfterSeconds(_despawnTime, bullet));
+                Rigidbody rb = bullet.GetComponent<Rigidbody>();
+                //rb.isKinematic = false;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
                 return bullet;
             }
         }
@@ -51,10 +54,17 @@ public class BulletPool : MonoBehaviour
         return null;
     }
 
-    private IEnumerator DespawnAfterSeconds(float seconds, GameObject bullet)
+    public void Despawn(GameObject bullet, Rigidbody rb)
     {
-        yield return new WaitForSecondsRealtime(seconds);
-        bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         bullet.SetActive(false);
     }
+    
+    /*private IEnumerator DespawnAfterSeconds(float seconds, GameObject bullet, Rigidbody rb)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        //rb.isKinematic = true;
+        bullet.SetActive(false);
+    }*/
 }

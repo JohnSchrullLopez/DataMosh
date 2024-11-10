@@ -39,6 +39,10 @@ public class STargetController : MonoBehaviour
         {
             _currentTarget = targets[0];
         }
+        else
+        {
+            SGameManager.SetAllEnemiesDead(true);
+        }
     }
 
     public GameObject GetCurrentTarget()

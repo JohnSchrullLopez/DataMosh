@@ -60,8 +60,6 @@ public class SPlayerMovement : MonoBehaviour
         _input = GetComponent<SPlayerInput>();
         _orientation = transform.GetChild(0).GetComponent<Transform>();
         _camFollow = GameObject.Find("CamParent").GetComponent<AttachCamera>();
-
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update()

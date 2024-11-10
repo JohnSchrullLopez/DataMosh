@@ -24,6 +24,7 @@ public class SDataMoshEffect : MonoBehaviour
     private bool _renderingPaused = false;
     private bool _falling = false;
     private bool _respawning = false;
+    private bool _debugging = false;
 
     private void Awake()
     {
@@ -56,6 +57,11 @@ public class SDataMoshEffect : MonoBehaviour
     {
         EffectSmoothing();
         Shader.SetGlobalFloat(_intensityID, _intensityValue);
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            _debugging = !_debugging;
+        }
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -87,11 +93,17 @@ public class SDataMoshEffect : MonoBehaviour
 
     private void EffectSmoothing()
     {
+        if (_debugging)
+        {
+            _intensityValue = 1.0f;
+            return;
+        }
+        
         if (_falling && !_respawning)
         {
             if (lerpVal >= 1)
             {
-                StartCoroutine(RespawnPlayer());
+                RespawnWithEffect();
             }
             lerpVal += Time.deltaTime * 2f;
             lerpVal = Mathf.Clamp(lerpVal, 0, 1);
@@ -103,11 +115,29 @@ public class SDataMoshEffect : MonoBehaviour
             lerpVal = Mathf.Lerp(lerpVal, target, Time.deltaTime * 2.5f);
             _intensityValue = lerpVal;
         }
-        
-        Debug.Log(_intensityValue);
     }
 
-    private IEnumerator RespawnPlayer()
+    public void StartTransitionToEnd()
+    {
+        StartCoroutine(TransitionToEnd());
+    }
+    
+    public IEnumerator TransitionToEnd()
+    {
+        _respawning = true;
+        _renderingPaused = true;
+        yield return new WaitForSecondsRealtime(0.5f);
+        SGameManager.EndLevel();
+        _renderingPaused = false;
+        _respawning = false;
+    }
+    
+    public void RespawnWithEffect()
+    {
+        StartCoroutine(RespawnPlayer());
+    }
+    
+    public IEnumerator RespawnPlayer()
     {
         _respawning = true;
         _renderingPaused = true;
