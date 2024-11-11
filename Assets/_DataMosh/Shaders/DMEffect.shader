@@ -111,9 +111,9 @@ Shader "Custom/DMEffect"
                 #endif
 
                 
-                //FULLSCREEN
-                //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity);
+                //FULLSCREENex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity);
 
+                //fixed4 col = lerp(t
                 //OBJECT MASKED
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), tex2D(_Mask, i.uv).a);
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), lerp(round(1-(n)/1.4),1, tex2D(_Mask, i.uv).a));
@@ -121,8 +121,8 @@ Shader "Custom/DMEffect"
                 //DOF BASED
                 //fixed4 col = lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), 1 - depth.r);
 
-                //fixed4 col = lerp(lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity), tex2D(_Prev, mvuv), mask.a);
-                fixed4 col = lerp(lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity), tex2D(_Prev, mvuv), lerp(round(1-(n)/1.4),1, mask.a));
+                fixed4 col = lerp(lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity), tex2D(_Prev, mvuv), mask.a);
+                //fixed4 col = lerp(lerp(tex2D(_MainTex,i.uv),tex2D(_Prev, mvuv), _DMIntensity), tex2D(_Prev, mvuv), lerp(round(1-(n)/1.4),1, mask.a));
                 return col;
             }
             ENDCG

@@ -36,6 +36,8 @@ public class SDataMoshEffect : MonoBehaviour
     {
         //Generate motion texture on main camera
         this.GetComponent<Camera>().depthTextureMode = DepthTextureMode.MotionVectors;
+        
+        //Create textures
         _buffer = new RenderTexture(Screen.width, Screen.height, 16);
         _objectMask = new RenderTexture(Camera.main.pixelWidth, Camera.main.pixelHeight, 16);
         _topMask = new RenderTexture(Camera.main.pixelWidth, Camera.main.pixelHeight, 16);

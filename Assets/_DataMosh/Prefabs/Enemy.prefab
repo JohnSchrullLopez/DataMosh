@@ -545,7 +545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bulletPrefab: {fileID: 25868521032627854, guid: 4be5a4a86e8e72d438366cd070545471, type: 3}
-  _shootCooldown: 0.5
+  _shootCooldown: 0.8
   _bulletForce: 35
   _rotationPoint: {fileID: 7151951273909836834}
   _bulletSpawnPoint: {fileID: 2253518907079357297}
