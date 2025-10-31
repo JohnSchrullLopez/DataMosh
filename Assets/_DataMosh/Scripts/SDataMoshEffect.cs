@@ -29,7 +29,7 @@ public class SDataMoshEffect : MonoBehaviour
     private void Awake()
     {
         Application.targetFrameRate = 60;
-        _targetController = GameObject.FindGameObjectWithTag("Target Controller").GetComponent<STargetController>();
+        //_targetController = GameObject.FindGameObjectWithTag("Target Controller").GetComponent<STargetController>();
     }
 
     private void Start()
@@ -60,7 +60,7 @@ public class SDataMoshEffect : MonoBehaviour
         EffectSmoothing();
         Shader.SetGlobalFloat(_intensityID, _intensityValue);
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetButtonDown("Jump"))
         {
             _debugging = !_debugging;
         }
@@ -97,7 +97,17 @@ public class SDataMoshEffect : MonoBehaviour
     {
         if (_debugging)
         {
-            _intensityValue = 1.0f;
+            //_intensityValue = 1.0f;
+            lerpVal += Time.deltaTime * 2f;
+            lerpVal = Mathf.Clamp(lerpVal, 0, 1);
+            _intensityValue = lerpVal;
+            return;
+        }
+        else
+        {
+            lerpVal -= Time.deltaTime * 2f;
+            lerpVal = Mathf.Clamp(lerpVal, 0, 1);
+            _intensityValue = lerpVal;
             return;
         }
         
@@ -113,9 +123,9 @@ public class SDataMoshEffect : MonoBehaviour
         }
         else if (!_respawning)
         {
-            float target = _targetController.GetDistanceToTarget();
-            lerpVal = Mathf.Lerp(lerpVal, target, Time.deltaTime * 2.5f);
-            _intensityValue = lerpVal;
+            // float target = _targetController.GetDistanceToTarget();
+            // lerpVal = Mathf.Lerp(lerpVal, target, Time.deltaTime * 2.5f);
+            // _intensityValue = lerpVal;
         }
     }
 
